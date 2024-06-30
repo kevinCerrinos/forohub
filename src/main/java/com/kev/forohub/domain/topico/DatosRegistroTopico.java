@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public record DatosRegistroTopico(
         @NotNull Long id_curso,
         @NotBlank String titulo,
-        @NotBlank String mensaje,
-        @NotBlank String autor
+        @NotBlank String mensaje
         ) {
 }

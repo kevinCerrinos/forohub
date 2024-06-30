@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.kev.forohub.helper.ResponseMessage;
 import com.kev.forohub.helper.Type;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,6 +34,12 @@ public class TratadorDeErrores {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ResponseMessage> runtimeExceptions(RuntimeException e){
+        var response = new ResponseMessage(Type.ERROR,e.getMessage());
+        return ResponseEntity.internalServerError().body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ResponseMessage> runtimeExceptions(DataIntegrityViolationException e){
         var response = new ResponseMessage(Type.ERROR,e.getMessage());
         return ResponseEntity.internalServerError().body(response);
     }

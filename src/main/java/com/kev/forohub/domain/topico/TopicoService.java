@@ -2,13 +2,22 @@ package com.kev.forohub.domain.topico;
 
 import com.kev.forohub.domain.curso.Curso;
 import com.kev.forohub.domain.curso.CursoRepository;
+import com.kev.forohub.domain.respuesta.DatosDetalleRespuesta;
+import com.kev.forohub.domain.respuesta.DatosRespuesta;
 import com.kev.forohub.helper.ResponseMessage;
 import com.kev.forohub.helper.Type;
+import com.kev.forohub.infra.security.usuario.Usuario;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TopicoService {
@@ -31,9 +40,21 @@ public class TopicoService {
             throw new EntityNotFoundException("el id de referencia al curso no existe");
         }
 
+        if(topicoRespository.existsByTitulo(datos.titulo())){
+            throw new DataIntegrityViolationException("Ya existe un topico con este titulo");
+        }
+
+        if(topicoRespository.existsByMensaje(datos.mensaje())){
+            throw  new DataIntegrityViolationException("Ya existe un topico con este mensaje");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+
         var curso = cursoRepository.getReferenceById(datos.id_curso());
 
-        var topico = new Topico(datos,curso);
+        var topico = new Topico(datos,curso,usuario);
+
 
         topicoRespository.save(topico);
 
@@ -41,7 +62,7 @@ public class TopicoService {
                 topico.getId(),
                 topico.getTitulo(),
                 topico.getMensaje(),
-                topico.getAutor(),
+                topico.getAutor().getNombre(),
                 topico.getStatus().toString(),
                 topico.getFechaCreacion(),
                 topico.getFechaActualizacion()
@@ -52,7 +73,7 @@ public class TopicoService {
         return topicoRespository.findAll(pageable).map(DatosListadoTopico::new);
     }
 
-    public DatoRespuestaTopico getTopico(Long id) {
+    public DatoRespuestaGetTopico getTopico(Long id) {
 
         if(id == null){
             throw new ValidationException("El id del topico no debe ser nulo");
@@ -64,14 +85,25 @@ public class TopicoService {
 
         var topico = topicoRespository.getReferenceById(id);
 
-        return new DatoRespuestaTopico(
+        List<DatosRespuesta> respuestas = topico.getRespuestas()
+                .stream()
+                .map(r -> new DatosRespuesta(
+                        r.getId(),
+                        r.getMensaje(),
+                        r.getSolucion(),
+                        r.getAutor().getNombre(),
+                        r.getFechaCreacion()
+                )).collect(Collectors.toList());
+
+        return new DatoRespuestaGetTopico(
                 topico.getId(),
                 topico.getTitulo(),
                 topico.getMensaje(),
-                topico.getAutor(),
+                topico.getAutor().getNombre(),
                 topico.getStatus().toString(),
                 topico.getFechaCreacion(),
-                topico.getFechaActualizacion()
+                topico.getFechaActualizacion(),
+                respuestas
         );
     }
 
@@ -91,7 +123,7 @@ public class TopicoService {
                 topico.getId(),
                 topico.getTitulo(),
                 topico.getMensaje(),
-                topico.getAutor(),
+                topico.getAutor().getNombre(),
                 topico.getStatus().toString(),
                 topico.getFechaActualizacion()
         );

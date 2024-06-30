@@ -1,5 +1,9 @@
 package com.kev.forohub.infra.security.usuario;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.kev.forohub.domain.respuesta.Respuesta;
+import com.kev.forohub.domain.topico.Topico;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -9,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,11 +31,19 @@ public class Usuario implements UserDetails {
     private String nombre;
     private String email;
     private String clave;
+    @OneToMany(mappedBy = "autor",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonManagedReference
+    private List<Topico> topicos;
+    @OneToMany(mappedBy = "autor",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonManagedReference
+    private List<Respuesta> respuestas;
 
     public Usuario(DatosRegistroUsuario datosRegistroUsuario, String password) {
         this.nombre = datosRegistroUsuario.nombre();
         this.email = datosRegistroUsuario.email();
         this.clave  = password;
+        this.topicos = new ArrayList<>();
+        this.respuestas = new ArrayList<>();
     }
 
 

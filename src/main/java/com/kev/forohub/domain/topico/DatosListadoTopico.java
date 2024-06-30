@@ -19,7 +19,7 @@ public record DatosListadoTopico(
                 topico.getCurso().getNombre(),
                 topico.getTitulo(),
                 topico.getMensaje(),
-                topico.getAutor(),
+                topico.getAutor().getNombre(),
                 topico.getStatus().toString(),
                 topico.getFechaCreacion(),
                 topico.getFechaActualizacion()

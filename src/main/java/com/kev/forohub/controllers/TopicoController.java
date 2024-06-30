@@ -37,8 +37,8 @@ public class TopicoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DatoRespuestaTopico> getTopico(@PathVariable Long idTopico){
-        var topico = topicoService.getTopico(idTopico);
+    public ResponseEntity<DatoRespuestaGetTopico> getTopico(@PathVariable Long id){
+        var topico = topicoService.getTopico(id);
         return ResponseEntity.ok(topico);
     }
 
