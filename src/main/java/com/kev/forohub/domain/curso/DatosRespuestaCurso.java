@@ -5,4 +5,7 @@ public record DatosRespuestaCurso(
         String nombre,
         String categoria
 ) {
+    public DatosRespuestaCurso(Curso curso){
+        this(curso.getId(), curso.getNombre(), curso.getCategoria());
+    }
 }

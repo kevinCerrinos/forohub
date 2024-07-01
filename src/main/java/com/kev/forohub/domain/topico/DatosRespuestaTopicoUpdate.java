@@ -8,6 +8,6 @@ public record DatosRespuestaTopicoUpdate(
         String mensaje,
         String autor,
         String status,
-        LocalDateTime fechaCreacion
+        LocalDateTime fechaActualizacion
 ) {
 }

@@ -1,5 +1,7 @@
 package com.kev.forohub.domain.respuesta;
 
+import com.kev.forohub.domain.shared.Status;
+
 import java.time.LocalDateTime;
 
 public record DatosDetalleRespuesta(
@@ -8,6 +10,7 @@ public record DatosDetalleRespuesta(
         String solucion,
         String autor,
         String topico,
-        LocalDateTime fechaCreacion
+        LocalDateTime fechaCreacion,
+        Status status
 ) {
 }

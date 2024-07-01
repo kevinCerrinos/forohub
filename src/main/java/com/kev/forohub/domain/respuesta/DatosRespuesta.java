@@ -9,4 +9,7 @@ public record DatosRespuesta(
         String autor,
         LocalDateTime fechaCreacion
 ) {
+    public DatosRespuesta(Respuesta respuesta){
+        this(respuesta.getId(), respuesta.getMensaje(), respuesta.getSolucion(), respuesta.getAutor().getNombre(),respuesta.getFechaCreacion());
+    }
 }

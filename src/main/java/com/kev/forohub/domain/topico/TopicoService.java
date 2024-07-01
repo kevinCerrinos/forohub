@@ -1,9 +1,8 @@
 package com.kev.forohub.domain.topico;
 
-import com.kev.forohub.domain.curso.Curso;
 import com.kev.forohub.domain.curso.CursoRepository;
-import com.kev.forohub.domain.respuesta.DatosDetalleRespuesta;
 import com.kev.forohub.domain.respuesta.DatosRespuesta;
+import com.kev.forohub.domain.respuesta.RespuestaRepository;
 import com.kev.forohub.helper.ResponseMessage;
 import com.kev.forohub.helper.Type;
 import com.kev.forohub.infra.security.usuario.Usuario;
@@ -12,6 +11,9 @@ import jakarta.validation.ValidationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,22 @@ public class TopicoService {
 
     private final TopicoRespository topicoRespository;
     private final CursoRepository cursoRepository;
+    private final RespuestaRepository respuestaRepository;
+    private final PagedResourcesAssembler<DatosRespuesta> pagedResourcesAssemblerDatosRespuesta;
+    private final PagedResourcesAssembler<DatosListadoTopico> pagedResourcesAssemblerDatosListadoTopico;
 
-    public TopicoService(TopicoRespository topicoRespository,CursoRepository cursoRepository){
+    public TopicoService(
+            TopicoRespository topicoRespository,
+            CursoRepository cursoRepository,
+            RespuestaRepository respuestaRepository,
+            PagedResourcesAssembler<DatosRespuesta> pagedResourcesAssemblerDatosRespuesta,
+            PagedResourcesAssembler<DatosListadoTopico> pagedResourcesAssemblerDatosListadoTopico
+    ){
         this.topicoRespository = topicoRespository;
         this.cursoRepository = cursoRepository;
+        this.respuestaRepository = respuestaRepository;
+        this.pagedResourcesAssemblerDatosRespuesta = pagedResourcesAssemblerDatosRespuesta;
+        this.pagedResourcesAssemblerDatosListadoTopico = pagedResourcesAssemblerDatosListadoTopico;
     }
 
     public DatoRespuestaTopico registrarTopico(DatosRegistroTopico datos){
@@ -69,8 +83,9 @@ public class TopicoService {
         );
     }
 
-    public Page<DatosListadoTopico> listarTopicos(Pageable pageable) {
-        return topicoRespository.findAll(pageable).map(DatosListadoTopico::new);
+    public PagedModel<EntityModel<DatosListadoTopico>> listarTopicos(Pageable pageable) {
+        var pagedModel = topicoRespository.findAll(pageable).map(DatosListadoTopico::new);
+        return pagedResourcesAssemblerDatosListadoTopico.toModel(pagedModel);
     }
 
     public DatoRespuestaGetTopico getTopico(Long id) {
@@ -141,5 +156,24 @@ public class TopicoService {
         topicoRespository.delete(topico);
 
         return new ResponseMessage(Type.SUCCESS,"El topico con id:"+id+" fue eliminado correctamente");
+    }
+
+
+    public PagedModel<EntityModel<DatosRespuesta>> getRespuestas(Long id , Pageable pageable) {
+
+        if(id == null){
+            throw new ValidationException("El id del topico no debe ser nulo");
+        }
+
+        if (!topicoRespository.existsById(id)){
+            throw new EntityNotFoundException("el id de referencia al topico no existe");
+        }
+
+        var topico = topicoRespository.getReferenceById(id);
+
+        var respuestaPage = respuestaRepository.findAllByTopico(pageable,topico).map(DatosRespuesta::new);
+
+        return pagedResourcesAssemblerDatosRespuesta.toModel(respuestaPage);
+
     }
 }

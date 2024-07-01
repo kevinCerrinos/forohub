@@ -57,7 +57,8 @@ public class RespuestaService {
                 respuesta.getSolucion(),
                 respuesta.getAutor().getNombre(),
                 respuesta.getTopico().getTitulo(),
-                respuesta.getFechaCreacion()
+                respuesta.getFechaCreacion(),
+                respuesta.getStatus()
         );
     }
 
@@ -74,5 +75,30 @@ public class RespuestaService {
         respuestaRepository.delete(respuesta);
 
         return new ResponseMessage(Type.SUCCESS, "La respuesta se elimino correctamente");
+    }
+
+    public DatosDetalleRespuesta updateRespuesta(DatosUpdateRespuesta datos) {
+
+        if(datos.idRespuesta() == null){
+            throw new ValidationException("El id de la respuesta no debe ser nulo");
+        }
+
+        if(!respuestaRepository.existsById(datos.idRespuesta())){
+            throw new EntityNotFoundException("el id de referencia a la respuesta no existe");
+        }
+
+        var respuesta = respuestaRepository.getReferenceById(datos.idRespuesta());
+
+        respuesta.updateDatos(datos);
+
+        return new DatosDetalleRespuesta(
+                respuesta.getId(),
+                respuesta.getMensaje(),
+                respuesta.getSolucion(),
+                respuesta.getAutor().getNombre(),
+                respuesta.getTopico().getTitulo(),
+                respuesta.getFechaCreacion(),
+                respuesta.getStatus()
+        );
     }
 }

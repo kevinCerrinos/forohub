@@ -1,4 +1,4 @@
-package com.kev.forohub.domain.topico;
+package com.kev.forohub.domain.shared;
 
 public enum Status {
     CREATED,

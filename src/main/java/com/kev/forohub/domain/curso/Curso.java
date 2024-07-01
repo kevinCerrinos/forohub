@@ -35,4 +35,14 @@ public class Curso {
         this.categoria = datos.categoria();
         this.topicos = new ArrayList<>();
     }
+
+    public void updateDatos(DatosRegistroCurso datos) {
+        if(datos.nombre() != null){
+            this.nombre = datos.nombre();
+        }
+
+        if(datos.categoria() != null){
+            this.categoria = datos.categoria();
+        }
+    }
 }

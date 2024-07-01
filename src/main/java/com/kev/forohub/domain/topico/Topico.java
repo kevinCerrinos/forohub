@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kev.forohub.domain.respuesta.Respuesta;
 import com.kev.forohub.domain.curso.Curso;
+import com.kev.forohub.domain.shared.Status;
 import com.kev.forohub.infra.security.usuario.Usuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
