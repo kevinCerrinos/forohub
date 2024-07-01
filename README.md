@@ -1,7 +1,7 @@
 # API FORO-HUB
 ## Spring Boot, Spring Boot Security , PostgreSQL, JPA, Hibernate Rest API
 
-Build Restful CRUD API for a simple Note-Taking application using Spring Boot, Mysql, JPA and Hibernate.
+Build Restful API application using Spring Boot, Postgres, JPA and Hibernate.
 
 ## Requirements
 
